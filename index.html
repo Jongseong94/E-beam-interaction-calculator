@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>    
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.16.1/plotly.min.js"></script>
+
+    <title>Lungerich Group Tools</title>
+</head>
+
+<body>
+    <div id="wrapper">
+
+        <h1><a href="index.html">Lungerich Group tools</a></h1>         
+        <h1>Electron scattering and energy parameters calculator</h1>
+        <p class="description"> Description section.. It will be revised.
+
+    <div class="container1">
+        <!-- Knock-on cross section 계산기 -->
+        <div class="knock-on-cross-section-calculator">
+            <h2>Knock-on Displacement Cross Section(σ<sub>KO</sub>) Calculator</h2>
+            <p class="equation">
+                $$\sigma_{KO} = 4\pi\left(\frac{Z e^2}{4 \pi \epsilon_0 2 \gamma m_0 c^2 \beta^2}\right)^2 \left[\left(\frac{E_{\theta}}{E_{threshold}} - 1\right) - \beta^2 \ln\left(\frac{E_{\theta}}{E_{threshold}}\right) + \pi Z \alpha \beta \left(2\left(\sqrt{\frac{E_{\theta}}{E_{threshold}}} - 1\right) - \ln\left(\frac{E_{\theta}}{E_{threshold}}\right)\right)\right]$$
+            </p>
+            <p class="equation">
+                $$ (\text{where,  } \gamma = \frac{1}{\sqrt{1 - \beta^2}}, \quad \beta = \sqrt{1 - \left(1 + \frac{E_e}{m_0 c^2} \right)^{-2}} \quad \text{and} \quad E_{\theta} = \frac{E_e \cdot (E_e + 2 m_0 c^2) \cdot (1 - \cos{\theta})}{M c^2}) $$                
+            </p>
+            
+            <!-- Ee 입력 -->
+            <div class="input-group">
+                <label class="input-label" for="Ee-cross-value">E<sub>e</sub> (Incident electron energy) :</label>
+                <input type="number" id="Ee-cross-value" placeholder="Enter Eₑ in keV">
+            </div>
+
+            <!-- Atomic number 입력 -->
+            <div class="input-group">
+                <label class="input-label" for="Z-atom-value">Z (Atomic number) :</label>
+                <input type="number" id="Z-atom-value" placeholder="Enter Atomic number">
+            </div>
+
+            <!-- Atomic Mass Number 입력 -->
+            <div class="input-group">
+                <label class="input-label" for="A-Mass-value">A (Atomic mass number) :</label>
+                <input type="number" id="A-Mass-value" placeholder="Enter Atomic mass number (ex. H = 1, C = 12)">
+            </div>
+
+            <!-- Ethreshold 입력 -->
+            <div class="input-group">
+                <label class="input-label" for="Threshold-cross-value">E<sub>threshold</sub> (Bond threshold energy) :</label>
+                <input type="number" id="Threshold-cross-value" placeholder="Enter Bond threshold in eV">
+            </div>
+
+            <!-- Theta 입력 -->
+            <div class="input-group">
+                <label class="input-label" for="theta-cross-value">θ (Scattering angle) :</label>
+                <input type="number" id="theta-cross-value" placeholder="Enter θ in degrees">
+            </div>
+
+            <!-- 단위 선택 -->
+            <div class="input-group">
+                <label class="input-label" for="unit-select">Select unit : </label>
+                <select id="unit-select">
+                    <option value="barn">barn</option>
+                    <option value="angstrom2">Å² (Angstrom²)</option>
+                </select>
+            </div>
+
+
+            <!-- 계산 버튼 -->
+            <button onclick="processCrossSectionData()">Calculate σ<sub>KO</sub></button>
+            <!-- 2D 그래프 생성 버튼 -->
+            <button onclick="generateCrossSectionGraph(parseFloat(document.getElementById('Z-atom-value').value), parseFloat(document.getElementById('A-Mass-value').value), parseFloat(document.getElementById('Threshold-cross-value').value), parseFloat(document.getElementById('theta-cross-value').value), document.getElementById('unit-select').value)">Generate σ<sub>KO</sub> - E<sub>e</sub> Graph(2D plot)</button>
+            <!-- 3D 그래프 생성 버튼 -->
+            <button onclick="generate3DCrossSectionGraph(parseFloat(document.getElementById('Z-atom-value').value), parseFloat(document.getElementById('A-Mass-value').value), parseFloat(document.getElementById('Threshold-cross-value').value), document.getElementById('unit-select').value)">Generate σ<sub>KO</sub> - E<sub>e</sub> - E<sub>thereshold</sub> Graph(3D plot) </button>
+            
+            <!-- 결과 표시 -->
+            <p id="cross-section-emax-result">E<sub>max</sub> : </p>
+            <p id="cross-section-ed-result">E<sub>θ</sub> : </p>
+            <p id="cross-section-result">σ<sub>KO</sub> : </p>
+
+            <!-- 저장 버튼 추가 -->
+            <div class="button-container">
+                <button id="download-csv-button" onclick="downloadCSVFile()">CSV File save for 3D plot</button>
+            </div>
+
+            <!-- 2D 및 3D 그래프를 나란히 배치 -->
+            <div class="graph-wrapper">
+                <div class="graph-container">
+                    <canvas id="cross-section-graph"></canvas>
+                </div>
+                <div class="graph-container">
+                    <div id="3d-graph"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container2">
+        <!-- ionization cross section 계산기 -->
+        <div class="ionization-cross-section-calculator">
+            <h2>Ionization Cross Section(σ<sub>rBEB</sub>) Calculator</h2>
+            <p class="equation">
+                $$\sigma_{\text{rBEB}} = \frac{4\pi a_0^2 \alpha^4 N}{2b'(\beta_t^2 + \beta_u^2 + \beta_b^2)} 
+                \left\{ \frac{1}{2} \left[ \ln\left(\frac{\beta_t^2}{1-\beta_t^2}\right) - \beta_t^2 - \ln(2b') \right] 
+                \left(1 - \frac{1}{t^2}\right) + 1 - \frac{1}{t} - \frac{\ln t}{t+1} 
+                \left(\frac{1+2t'}{(1+t'/2)^2}\right) + \frac{b'^2}{(1+t'/2)^2} \frac{t-1}{2} \right\}$$
+            </p>
+            <p class="equation">
+                $$ (\text{where,  }t = \frac{E_e}{B}, \quad t' = \frac{E_e}{mc^2}, \quad b' = \frac{B}{mc^2}, \quad u' = \frac{U}{mc^2}, \quad \beta_t^2 = 1 - \frac{1}{(1 + t')^2}, \quad \beta_b^2 = 1 - \frac{1}{(1 + b')^2} \quad \text{and} \quad \beta_u^2 = 1 - \frac{1}{(1 + u')^2})$$
+            </p>
+
+
+            <!-- Incident Electron Energy 입력 -->
+            <div class="input-group">
+                <label class="input-label" for="Ionization-T-value">E<sub>e</sub> (Incident electron energy) :</label>
+                <input type="number" id="Ionization-T-value" placeholder="Enter Eₑ in keV">
+            </div>
+    
+            <!-- 동적으로 B와 U 입력 필드를 추가/제거할 수 있는 영역 -->
+            <div id="input-container">
+                <div class="input-group">
+                    <label class="input-label" for="B-value-1">(1) Orbital Binding Energy (B) :</label> 
+                    <input type="number" id="B-value-1" placeholder="Enter Binding energy (B) in eV">
+                    
+                    <label class="input-label" for="U-value-1">Orbital Kinetic Energy (U) :</label>
+                    <input type="number" id="U-value-1" placeholder="Enter Kinetic energy (U) in eV">
+                </div>
+            </div>
+
+            <!-- 단위 선택 -->
+            <div class="input-group">
+                <label class="input-label" for="unit-select">Select unit : </label>
+                <select id="unit-select-ionization">
+                    <option value="barn">barn</option>
+                    <option value="angstrom2">Å² (Angstrom²)</option>
+                </select>
+            </div>
+
+            <!-- 필드를 추가하거나 제거하는 버튼 -->
+            <button class="Add-remove-botton" onclick="addInputField()">Add</button>
+            <button class="Add-remove-botton" onclick="removeInputField()">Remove</button>
+            <button class="Add-remove-botton" onclick="clearAllInputFields()">Clear All</button>
+            <br><br>
+
+            <!-- 계산 버튼 (단일 값 계산용) -->
+            <button onclick="calculateIonizationCrossSection()">Calculate σ<sub>rBEB</sub></button>
+
+            <!-- 2D 그래프 생성 버튼 (여러 그래프 그리기) -->
+            <button onclick="generateMultipleIonizationGraphs()">Generate Multiple σ<sub>rBEB</sub> - E<sub>e</sub> Graphs</button>
+
+            <!-- CSV 다운로드 버튼 -->
+            <button onclick="downloadCSVFileforIonizationcrosssection()">CSV File save for 2D plot</button>
+    
+            <!-- 결과 표시 -->
+            <p id="ionization-cross-section-result">σ<sub>rBEB</sub> : </p>
+            <br>
+    
+            <!-- ionization 2D graph -->
+            <div class="graph-wrapper">
+                <div class="graph-container">
+                    <canvas id="Ionization-cross-section-graph"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>    
+</div>
+
+    <br>
+    <li><a target="blank" href="https://www.lungerichlab.com/">Paper link</a></li>
+    <li><a target="blank" href="https://www.lungerichlab.com/">Lungerich Group</a></li>
+    <li><a target="blank" href="https://scholar.google.com/citations?user=SqZM0A4AAAAJ&hl=de">Google Scholar</a>
+    </li>
+  </ul>
+  <p>This web page was constructed and is maintained by Jongseong Park. If you have any trouble
+    please contact. pjs939@yonsei.ac.kr</p>
+</body>
+</html>
