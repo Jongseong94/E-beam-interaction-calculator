@@ -58,10 +58,19 @@ function processCrossSectionData() {
     // 선택된 단위에 따라 변환 처리
     if (selectedUnit === "angstrom2") {
         crossSection_barns_cross *= 1e-8;  // 1 barn = 1e-8 Å²
+    } else if (selectedUnit === "nm2") {
+        crossSection_barns_cross *= 1e-10;  // 1 barn = 1e-10 nm²
     }
 
     // 결과 표시 (HTML로 출력)
-    const unitText = selectedUnit === "barn" ? "barns" : "Å²";
+    let unitText;
+    if (selectedUnit === "barn") {
+        unitText = "barns";
+    } else if (selectedUnit === "angstrom2") {
+        unitText = "Å²";
+    } else if (selectedUnit === "nm2") {
+        unitText = "nm²";
+    }
     document.getElementById('cross-section-emax-result').innerHTML = `E<sub>max</sub> : ${Emax_cross.toFixed(2)} eV`;
     document.getElementById('cross-section-ed-result').innerHTML = `E<sub>θ</sub> : ${Ed_cross.toFixed(2)} eV`;
     document.getElementById('cross-section-result').innerHTML = `σ<sub>KO</sub> : ${crossSection_barns_cross.toExponential(2)} ${unitText}`;
@@ -90,10 +99,14 @@ function generateCrossSectionGraph(Z_atom_cross, A_Mass_cross, E_threshold_cross
         if (isNaN(crossSection)) continue;
 
         let crossSection_barns = crossSection / 1e-28;
-        if (selectedUnit === "angstrom2") crossSection_barns *= 1e-8;
+        if (selectedUnit === "angstrom2") {
+            crossSection_barns *= 1e-8;  // 1 barn = 1e-8 Å²
+        } else if (selectedUnit === "nm2") {
+            crossSection_barns *= 1e-10;  // 1 barn = 1e-10 nm²
+        }
 
         Ee_values.push(Ee_keV);
-        crossSections.push(crossSection_barns);
+        crossSections.push(parseFloat(crossSection_barns.toFixed(20)));  // 소수점 자릿수를 10자리까지 설정
         pointStyles.push('rgba(75, 192, 192, 1)');
     }
 
@@ -101,7 +114,15 @@ function generateCrossSectionGraph(Z_atom_cross, A_Mass_cross, E_threshold_cross
     if (chartInstance) chartInstance.destroy();
     chartInstance = new Chart(ctx, {
         type: 'line',
-        data: { labels: Ee_values, datasets: [{ label: 'Knock-on Cross Section (barn)', data: crossSections, borderColor: 'rgba(75, 192, 192, 1)', fill: false }] },
+        data: { 
+            labels: Ee_values, 
+            datasets: [{ 
+                label: `Knock-on Cross Section (${selectedUnit === 'barn' ? 'barn' : (selectedUnit === 'angstrom2' ? 'Å²' : 'nm²')})`, 
+                data: crossSections, 
+                borderColor: 'rgba(75, 192, 192, 1)', 
+                fill: false 
+            }] 
+        },
         options: {
             responsive: true,
             maintainAspectRatio: false,
@@ -111,21 +132,50 @@ function generateCrossSectionGraph(Z_atom_cross, A_Mass_cross, E_threshold_cross
                         display: true,
                         text: 'Ee (keV)'
                     },
-                    min: 0,      // X축의 최소값을 강제로 0으로 설정
-                    max: 600,    // X축의 최대값을 강제로 600으로 설정
+                    min: 0,
+                    max: 300,
                     ticks: {
-                        stepSize: 50,  // X축 간격을 50으로 설정
-                        autoSkip: true,  // 자동 생략을 비활성화
+                        autoSkip: false,  // 자동으로 레이블 생략하지 않도록 설정
                         callback: function(value, index, values) {
-                            // X축의 레이블을 일정한 간격으로 표시
-                            return value % 50 === 0 ? value : '';
+                            if (value % 50 === 0) {
+                                return value;  // 50 단위로만 레이블을 표시
+                            }
+                            return null;  // 그 외에는 레이블 표시하지 않음
                         }
                     }
-                }, y: { title: { display: true, text: `Cross Section (${selectedUnit === 'barn' ? 'barn' : 'Å²'})` }, min: -0.1 } }
+                }, 
+                y: { 
+                    title: { 
+                        display: true, 
+                        text: `Cross Section (${selectedUnit === 'barn' ? 'barn' : (selectedUnit === 'angstrom2' ? 'Å²' : 'nm²')})` 
+                    }, 
+                    ticks: {
+                        callback: function(value, index, values) {
+                            return value.toExponential(2);  // 지수 형태로 소수점 2자리까지만 표시
+                        }
+                    },
+                    min: 0
+                } 
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += parseFloat(context.parsed.y).toExponential(3);  // 소수점 자릿수 표시
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
         }
     });
 }
-
 // 3D 그래프 생성 함수
 function generate3DCrossSectionGraph(Z_atom_cross, A_Mass_cross, selectedUnit) {
 
@@ -160,6 +210,8 @@ function generate3DCrossSectionGraph(Z_atom_cross, A_Mass_cross, selectedUnit) {
             // 선택된 단위에 따라 변환 처리
             if (selectedUnit === "angstrom2") {
                 crossSection_barns *= 1e-8;  // 1 barn = 1e-8 Å²
+            } else if (selectedUnit === "nm2") {
+                crossSection_barns *= 1e-10;  // 1 barn = 1e-10 nm² (since 1 nm² = 100 Å²)
             }
 
             // 값이 0 이하이면 null 처리
@@ -177,7 +229,10 @@ function generate3DCrossSectionGraph(Z_atom_cross, A_Mass_cross, selectedUnit) {
         type: 'surface',
         contours: { x: { show: true, color: 'black', size: 10 }, y: { show: true, color: 'black', size: 0.1 } },
         colorscale: [[0, 'blue'], [0.5, 'green'], [1, 'red']],
-        showscale: true
+        showscale: true,
+        colorbar: {
+            tickformat: ".2e"  // Color bar에 지수 표기법 적용
+        }
     }];
 
     const layout = {
@@ -185,7 +240,10 @@ function generate3DCrossSectionGraph(Z_atom_cross, A_Mass_cross, selectedUnit) {
         scene: {
             xaxis: { title: 'Ee (keV)', range: [0, 300], dtick: 50 },
             yaxis: { title: 'E_threshold (eV)', range: [0.1, 100], dtick: 10 },  // y축은 E_threshold 범위
-            zaxis: { title: `Cross Section (${selectedUnit === 'barn' ? 'barn' : 'Å²'})` }
+            zaxis: { 
+                title: `Cross Section (${selectedUnit === 'barn' ? 'barn' : (selectedUnit === 'angstrom2' ? 'Å²' : 'nm²')})`,
+                tickformat: ".2e"  // 지수 표기법으로 변경
+            }        
         },
         width: 600, height: 600, autosize: false
     };
@@ -276,6 +334,10 @@ function calculateIonizationCrossSection() {
         // m² -> Å² 변환 (1 Å² = 10^-20 m²)
         ionizationCrossSection /= 1e-20; // m²에서 Å²로 변환
         unitText = "Å²";
+    } else if (selectedUnit === "nm2") {
+        // m² -> nm² 변환 (1 nm² = 10^-18 m²)
+        ionizationCrossSection /= 1e-18; // m²에서 nm²로 변환
+        unitText = "nm²";
     }
 
     // 결과를 HTML로 표시
@@ -389,6 +451,9 @@ function generateMultipleIonizationGraphs() {
             } else if (selectedUnit === 'angstrom2') {
                 // 미터 제곱(m²) -> Å² 변환 (1 Å² = 10^-20 m²)
                 ionizationCrossSection /= 1e-20;
+            } else if (selectedUnit === 'nm2') {
+                // 미터 제곱(m²) -> nm² 변환 (1 nm² = 10^-18 m²)
+                ionizationCrossSection /= 1e-18;
             }
 
             t_prime_values.push(T_keV);  // T를 x축 값으로 추가
@@ -427,7 +492,7 @@ function generateMultipleIonizationGraphs() {
     }
 
     // y축 단위에 따른 라벨 변경
-    const yLabel = selectedUnit === 'barn' ? 'Ionization Cross Section (barn)' : 'Ionization Cross Section (Å²)';
+    const yLabel = selectedUnit === 'barn' ? 'Ionization Cross Section (barn)' : (selectedUnit === 'angstrom2' ? 'Ionization Cross Section (Å²)' : 'Ionization Cross Section (nm²)');
 
     // 2D 그래프 생성 (Chart.js 사용)
     const ctx = document.getElementById('Ionization-cross-section-graph').getContext('2d');
@@ -457,6 +522,12 @@ function generateMultipleIonizationGraphs() {
                         display: true,
                         text: yLabel // 선택한 단위에 따른 y축 라벨
                     },
+                    
+                    ticks: {
+                        callback: function(value, index, values) {
+                            return value.toExponential(2);  // 지수 형태로 소수점 2자리까지만 표시
+                        }
+                    },
                     min: 0
                 }
             }
@@ -483,7 +554,7 @@ function downloadCSVFileforIonizationcrosssection() {
 
     // B, U 값 세트를 CSV 첫 번째 행에 추가 (B: value / U: value 형식)
     const selectedUnit = document.getElementById('unit-select-ionization').value; // 선택된 단위 가져오기
-    const unitLabel = selectedUnit === 'barn' ? 'barns' : 'Å²'; // 단위에 따른 라벨 설정
+    const unitLabel = selectedUnit === 'barn' ? 'barns' : (selectedUnit === 'angstrom2' ? 'Å²' : 'nm²'); // 단위에 따른 라벨 설정
 
     let totalInputCounter = inputCounter; // 실제 입력된 필드 개수를 기준으로 계산
 
