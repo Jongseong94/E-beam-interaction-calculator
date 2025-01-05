@@ -7,7 +7,7 @@ body {
 }
 
 .description-wrapper {
-    max-width: 1500px; /* 한 줄의 최대 너비를 1500px로 제한 */
+    max-width: 1000px; /* 한 줄의 최대 너비를 1500px로 제한 */
     margin: 0 auto;    /* 화면 가운데 정렬 */
     text-align: justify; /* 텍스트를 양쪽 정렬 */
     line-height: 1.6;  /* 줄 간격 설정 */
