@@ -4,6 +4,8 @@
 html, body {
     margin: 0; /* 기본 여백 제거 */
     padding: 0; /* 기본 패딩 제거 */
+    width: 100%;          /* 전체 뷰포트 너비 사용 */
+    min-height: 100vh;    /* 최소 높이를 뷰포트 높이로 설정 */
     display: flex; /* Flexbox 활성화 */
     justify-content: center; /* 가로 방향 가운데 정렬 */
     align-items: center; /* 세로 방향 가운데 정렬 */
@@ -14,11 +16,14 @@ html, body {
 
 /* 메인 콘텐츠 컨테이너 설정 */
 #wrapper {
-    padding: 30px; /* 내부 여백 */
-    background: white; /* 흰색 배경 */
-    box-shadow: 0 2px 100px rgba(245, 63, 63, 0.1); /* 약간의 그림자 효과 */
-    border-radius: 30px; /* 모서리를 둥글게 설정 */
-    overflow-y: auto; /* 콘텐츠가 많을 때 스크롤 가능 */
+    width: 1500px;;
+    margin: 0 auto;
+    padding: 30px;
+    box-sizing: border-box;
+    background: white;
+    box-shadow: 0 2px 100px rgba(245, 63, 63, 0.1);
+    border-radius: 30px;
+    overflow: auto; /* 필요한 경우 가로 스크롤 허용 */
 }
 
 h1 {
@@ -31,7 +36,7 @@ h1 {
 
 
 .description {
-    max-width: 1530px; /* 한 줄의 최대 너비를 1500px로 제한 */
+    max-width: 95%;
     text-align: justify; /* 텍스트를 양쪽 정렬 */
     font-family: Arial, sans-serif; /* 읽기 좋은 글꼴 */
     font-size: 17.8px;           /* 글꼴 크기 */
@@ -132,27 +137,20 @@ input[type="number"], .input-group input{
 }
 
 /* 부모 요소 스타일 수정 */
-.knock-on-cross-section-calculator{
-    margin: 20px 0;
+.knock-on-cross-section-calculator,
+.ionization-cross-section-calculator {
+    margin: 20px auto;
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    width: 1500px;  /* 부모 요소 너비 */
+    width: 95%;  /* 부모 요소 너비 */
+    max-width: 1500px;
 }
 
 .container2 {
     display: flex;
     flex-direction: column;  /* 가로에서 세로로 변경 */
     gap: 20px;  /* 요소 사이의 간격 */
-}
-
-/* 부모 요소 스타일 수정 */
-.ionization-cross-section-calculator{
-    margin: 20px 0;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    width: 1500px;  /* 부모 요소 너비 */
 }
 
 .graph-wrapper {
@@ -164,25 +162,26 @@ input[type="number"], .input-group input{
 }
 
 .graph-container {
-    flex-grow: 1;  /* 각 그래프 컨테이너가 균등하게 크기 차지 */
+    flex-grow: 1;
     padding: 10px;
-    box-sizing: border-box;  /* 패딩 포함한 크기 */
-    max-width: 50%;  /* 각 컨테이너의 최대 너비를 50%로 설정 */
-    height: 100%;  /* 부모 요소의 높이를 상속받아 사용 */
+    box-sizing: border-box;
+    max-width: 50%;  /* 혹은 원하는 비율 */
+    height: 90%;
     margin-top: 20px;
-    width: 100%;
+    width: 90%;
     display: flex;
     justify-content: center; 
     align-items: center;
     flex-direction: column;
-    text-align: center; /* 그래프를 가운데 정렬 */
+    text-align: center;
 }
 
 
 /* <canvas>와 <div> 모두 부모 크기에 맞춰서 조절 */
-#cross-section-graph, #3d-graph {
-    width: 100% !important;  /* 부모의 100% 너비 */
-    height: 100% !important; /* 부모의 100% 높이 */
+#cross-section-graph,
+#3d-graph {
+    width: 90% !important;  /* 부모의 100% 너비 */
+    height: 90% !important; /* 부모의 100% 높이 */
 }
 
 .equation {
@@ -204,4 +203,12 @@ mjx-container[jax="CHTML"] {
 
 .input-label {
     margin-right: 10px;
+}
+
+
+html {
+    -webkit-text-size-adjust: none;
+    -moz-text-size-adjust: none;
+    -ms-text-size-adjust: none;
+    text-size-adjust: none;
 }
