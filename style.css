@@ -212,3 +212,16 @@ html {
     -ms-text-size-adjust: none;
     text-size-adjust: none;
 }
+
+/* 기본 스타일 유지 */
+table {
+    border-collapse: collapse;
+  }
+  
+  table th, table td {
+    border: 1px solid #ccc;
+    padding: 2px 10px;
+    text-align: left;
+    font-size: 14px;
+  }
+  
