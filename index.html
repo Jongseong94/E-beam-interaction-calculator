@@ -79,6 +79,33 @@
                 <p class="equation">
                     $$ (\text{where,  } \gamma = \frac{1}{\sqrt{1 - \beta^2}}, \quad \beta = \sqrt{1 - \left(1 + \frac{E_e}{m_0 c^2} \right)^{-2}} \quad \text{and} \quad E_{\theta} = \frac{E_e \cdot (E_e + 2 m_0 c^2) \cdot (1 - \cos{\theta})}{M c^2}) $$                
                 </p>
+
+                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <!-- Left Table -->
+                <table>
+                    <tr><th>Symbol</th><th>Description</th></tr>
+                    <tr><td>$$Z$$</td><td>Atomic number of the target atom</td></tr>
+                    <tr><td>$$e$$</td><td>Elementary charge of the electron</td></tr>
+                    <tr><td>$$\varepsilon_0$$</td><td>Vacuum permittivity</td></tr>
+                    <tr><td>$$\gamma$$</td><td>Relativistic factor</td></tr>
+                    <tr><td>$$m_0$$</td><td>Rest mass of the electron</td></tr>
+                    <tr><td>$$c$$</td><td>Speed of light</td></tr>
+                    <tr><td>$$\beta$$</td><td>Ratio of electron velocity to speed of light</td></tr>
+                </table>
+
+                <!-- Right Table -->
+                <table>
+                    <tr><th>Symbol</th><th>Description</th></tr>
+                    <tr><td>$$E_e$$</td><td>Incident electron energy</td></tr>
+                    <tr><td>$$E_{threshold}$$</td><td>Knock-on displacement threshold energy</td></tr>
+                    <tr><td>$$E_{\theta}$$</td><td>Energy transferred to the target atom at the angle</td></tr>
+                    <tr><td>$$\theta$$</td><td>Scattering angle</td></tr>
+                    <tr><td>$$M$$</td><td>Mass of the target atom</td></tr>
+                    <tr><td>$$\alpha$$</td><td>Fine-structure constant</td></tr>
+                </table>
+                </div>
+
+                <br>
                 
                 <!-- Ee 입력 -->
                 <div class="input-group">
@@ -164,7 +191,24 @@
                     $$ (\text{where,  }t = \frac{E_e}{B}, \quad t' = \frac{E_e}{mc^2}, \quad b' = \frac{B}{mc^2}, \quad u' = \frac{U}{mc^2}, \quad \beta_t^2 = 1 - \frac{1}{(1 + t')^2}, \quad \beta_b^2 = 1 - \frac{1}{(1 + b')^2} \quad \text{and} \quad \beta_u^2 = 1 - \frac{1}{(1 + u')^2})$$
                 </p>
 
-
+                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <table>
+                      <tr><th style="text-align: center;">Symbol</th><th>Description</th></tr>
+                      <tr><td>$$\sigma_{\text{rBEB}}$$</td><td>Ionization cross section (rBEB model)</td></tr>
+                      <tr><td>$$a_0$$</td><td>Bohr radius</td></tr>
+                      <tr><td>$$\alpha$$</td><td>Fine-structure constant</td></tr>
+                      <tr><td>$$N$$</td><td>Number of electrons in the shell</td></tr>
+                    </table>
+                  
+                    <table>
+                      <tr><th style="text-align: center;">Symbol</th><th>Description</th></tr>
+                      <tr><td>$$B$$</td><td>Binding energy of the electron</td></tr>
+                      <tr><td>$$U$$</td><td>Kinetic energy of the bound electron</td></tr>
+                      <tr><td>$$E_e$$</td><td>Incident electron energy</td></tr>
+                    </table>
+                  </div>
+                <br>
+                
                 <!-- Incident Electron Energy 입력 -->
                 <div class="input-group">
                     <label class="input-label" for="Ionization-T-value">E<sub>e</sub> (Incident electron energy) :</label>
